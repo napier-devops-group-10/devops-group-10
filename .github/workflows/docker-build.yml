@@ -1,0 +1,35 @@
+
+name: Docker Build - Containerisation
+
+on:
+  push:
+    branches:
+      - feature/containerisation
+
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build Java application
+        run: mvn -B clean package
+
+      - name: Build Docker image
+        run: docker build -t devops-group10-app:latest .
+
+      - name: Test Docker container
+        run: docker run --rm devops-group10-app:latest
