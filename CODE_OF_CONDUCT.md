@@ -55,6 +55,6 @@ By committing to this repository, each member formally agrees to this Code of Co
 
 | Full Name | GitHub Username | Matriculation Number | Date Agreed |
 | :--- | :--- | :--- | :--- |
-| **Mohammad Hasan** | | | |
-| **Ashraf Hoque** | ahoque-napier | | |
-| **Adrian Riera Granada** | adriannapieruniversity | | |
+| **Mohammad Hasan** | |40805651 | |
+| **Ashraf Hoque** | ahoque-napier |40775087 | |
+| **Adrian Riera Granada** | adriannapieruniversity |40837460 | |
