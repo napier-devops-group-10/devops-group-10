@@ -1,11 +1,10 @@
-
 name: Docker Build - Containerisation
 
 on:
   push:
     branches:
       - feature/containerisation
-
+      - feature/db-connection
   pull_request:
     branches:
       - develop
@@ -26,10 +25,11 @@ jobs:
           cache: maven
 
       - name: Build Java application
-        run: mvn -B clean package
+        run: mvn -B clean package -DskipTests
 
-      - name: Build Docker image
-        run: docker build -t devops-group10-app:latest .
-
-      - name: Test Docker container
-        run: docker run --rm devops-group10-app:latest
+      - name: Test Docker Compose services with Secrets
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        run: docker compose up --build --abort-on-container-exit --exit-code-from app
