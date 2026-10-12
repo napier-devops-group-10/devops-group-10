@@ -146,6 +146,55 @@ public class App {
     }
 
     /**
+     * REQ-04: Retrieves the top N populated countries in the world where N is provided by the user.
+     *
+     * @param n The number of top populated countries to retrieve.
+     * @return List of Country objects, or empty list if an error occurs.
+     */
+    public ArrayList<Country> getTopNCountriesWorld(int n) {
+        ArrayList<Country> countries = new ArrayList<>();
+        if (n <= 0) {
+            System.out.println("Invalid value for N: " + n + ". Value must be greater than 0.");
+            return countries;
+        }
+
+        if (con == null) {
+            System.err.println("Database connection is not established.");
+            return countries;
+        }
+
+        String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
+                "FROM country c " +
+                "LEFT JOIN city ct ON c.Capital = ct.ID " +
+                "ORDER BY c.Population DESC " +
+                "LIMIT ?";
+
+        try {
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, n);
+            ResultSet rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Country country = new Country();
+                country.code = rset.getString("Code");
+                country.name = rset.getString("Name");
+                country.continent = rset.getString("Continent");
+                country.region = rset.getString("Region");
+                country.surfaceArea = rset.getDouble("SurfaceArea");
+                country.population = rset.getInt("Population");
+                country.capital = rset.getString("Capital");
+                if (country.capital == null) {
+                    country.capital = "N/A";
+                }
+                countries.add(country);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error executing top N countries query: " + e.getMessage());
+        }
+        return countries;
+    }
+
+    /**
      * Helper method to execute country SQL queries and map results to Country models.
      *
      * @param sql       The SQL query string.
@@ -254,6 +303,10 @@ public class App {
         // 3. REQ-03: Countries in Western Europe ordered by population
         ArrayList<Country> westernEuropeCountries = app.getCountriesByRegion("Western Europe");
         app.printCountries(westernEuropeCountries, "REQ-03: Countries in Western Europe by Population");
+
+        // 4. REQ-04: Top N populated countries in the world (e.g., N = 10)
+        ArrayList<Country> top10Countries = app.getTopNCountriesWorld(10);
+        app.printCountries(top10Countries, "REQ-04: Top 10 Populated Countries in the World");
 
         // Disconnect
         app.disconnect();
