@@ -253,7 +253,7 @@ The diagram represents the following interactions:
 
 ### Figure 4.1: Population Reporting System UML Use Case Diagram
 
-![Population Reporting System UML Use Case Diagram](img.png)
+![Population Reporting System UML Use Case Diagram](uml.png)
 
 *Figure 4.1: UML use case diagram showing the main actors and functions of the Population Reporting System.*
 
