@@ -21,7 +21,18 @@ The solution is structured around three main layers:
 The project also incorporates DevOps practices such as Maven builds, GitHub Actions, Docker, GitHub pull requests, release tagging, and collaborative issue tracking.
 
 ---
+## Scrum Roles & Technical Deliverables Breakdown
 
+| Team Member | Role | Core Deliverables (Review 1) | Target GitHub Artefacts |
+| :--- | :--- | :--- | :--- |
+| **Ashraf Hoque** | Scrum Master & DevOps Lead | • Project architecture & coordination<br>• Maintain pom.xml & dependencies<br>• Author CODE_OF_CONDUCT.md<br>• GitFlow branching structure setup<br>• Contribution Kanban (Zube) tracking | `pom.xml`, `CODE_OF_CONDUCT.md`, branch policies, PR reviews |
+| **Adrian Riera Granada** | Core Backend Java Developer | • Java app structure & DB connectivity<br>• Maven build to self-contained JAR<br>• Foundation data access objects<br>• Initial population queries implementation | `src/main/java/...` core classes, Database connection helper |
+| **Nicquan Jolly** | CI/CD Automation Engineer | • GitHub Actions setup (`.github/workflows`)<br>• Automated Maven build on push/PR<br>• Automate executable JAR artifact build<br>• Build status badge configuration | `.github/workflows/main.yml`, pipeline triggers, badge links |
+| **Elwin Lessey** | Containerisation Engineer | • Multi-stage Dockerfile for Maven JAR<br>• Containerised MySQL connection test<br>• Docker build step in GitHub Actions<br>• `docker-compose.yml` configuration | `Dockerfile`, `docker-compose.yml`, container docs |
+| **Emron Lessey** | Product Owner & Requirements Lead | • 32 CW report requirements breakdown<br>• User stories with acceptance criteria<br>• Zube.io / GitHub Projects integration<br>• Product Backlog & Sprint 1 board | GitHub Issues, Milestone setup, Sprint board cards |
+| **Ali Octave** | Systems Analyst & Documentation Lead | • Formal Use Case specifications<br>• UML Use Case Diagram for reports<br>• GitHub Release v0.1-alpha tagging<br>• Base README.md technical structure | `/docs/use-cases.md`, UML diagram assets, Release tag |
+
+---
 ## Objectives
 
 The main objectives of the project are to:
