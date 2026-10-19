@@ -158,6 +158,10 @@ population-reporting-system/
 │
 ├── docs/
 │   ├── use-cases.md
+│   ├── UC-001-generate-population-report.md
+│   ├── UC-002-search-population-data.md
+│   ├── UC-003-maintain-population-records.md
+│   ├── UC-004-export-population-report.md
 │   └── uml/
 │
 ├── src/
@@ -350,6 +354,18 @@ Later releases should document significant functional and DevOps changes using a
 ---
 
 ## Documentation
+
+### Formal Use Case Specifications
+
+Each formal use case is maintained as a separate Markdown file in the `docs/` directory:
+
+- [UC-001: Generate Population Report](docs/UC-001-generate-population-report.md)
+- [UC-002: Search Population Data](docs/UC-002-search-population-data.md)
+- [UC-003: Maintain Population Records](docs/UC-003-maintain-population-records.md)
+- [UC-004: Export Population Report](docs/UC-004-export-population-report.md)
+
+These specifications are transcribed from the *Formal Use Case Specifications* section of the supplied **Use Case Specification Document (Version 1.0, September 2026)**. The original use case names are preserved in the attribute tables, including names that differ from their section headings.
+
 
 Project documentation includes:
 
