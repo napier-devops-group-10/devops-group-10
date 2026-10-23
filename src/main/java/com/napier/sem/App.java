@@ -308,7 +308,48 @@ public class App {
         ArrayList<Country> top10Countries = app.getTopNCountriesWorld(10);
         app.printCountries(top10Countries, "REQ-04: Top 10 Populated Countries in the World");
 
+
+        // REQ-26: Total population of the world
+        long worldPopulation = app.getWorldPopulation();
+
+        if (worldPopulation >= 0) {
+            System.out.printf(
+                    "REQ-26: Total Population of the World: %,d%n",
+                    worldPopulation
+            );
+        } else {
+            System.err.println("REQ-26: Unable to retrieve world population.");
+        }
+
         // Disconnect
         app.disconnect();
     }
+
+
+/**
+ * REQ-26: Calculate the total population of the world.
+ *
+ * @return Total population, or -1 if the query fails.
+ */
+public long getWorldPopulation() {
+    if (con == null) {
+        System.err.println("Database connection is not established.");
+        return -1;
+    }
+
+    String sql = "SELECT SUM(Population) AS WorldPopulation FROM country";
+
+    try (PreparedStatement pstmt = con.prepareStatement(sql);
+         ResultSet rset = pstmt.executeQuery()) {
+
+        if (rset.next()) {
+            return rset.getLong("WorldPopulation");
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error retrieving world population: " + e.getMessage());
+    }
+
+    return -1;
+}
 }
