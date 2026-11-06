@@ -12,7 +12,7 @@ public class App {
     /**
      * Connection to MySQL database.
      */
-    private Connection con = null;
+    public Connection con = null;
 
     /**
      * Connect to the MySQL database with retry logic.
@@ -307,6 +307,21 @@ public class App {
         // 4. REQ-04: Top N populated countries in the world (e.g., N = 10)
         ArrayList<Country> top10Countries = app.getTopNCountriesWorld(10);
         app.printCountries(top10Countries, "REQ-04: Top 10 Populated Countries in the World");
+
+// ==========================================
+// TEST: Requirement 5
+// ==========================================
+        System.out.println("\n--- Testing Requirement 5 ---");
+        Requirement5 req5 = new Requirement5(app.con);
+
+// Test with Continent = "Europe" and N = 5
+        ArrayList<Country> topEurope = req5.getTopNCountriesInContinent("Europe", 5);
+        req5.printCountries(topEurope);
+
+// Test with Continent = "Asia" and N = 3
+        ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
+        req5.printCountries(topAsia);
+// ==========================================
 
         // Disconnect
         app.disconnect();
