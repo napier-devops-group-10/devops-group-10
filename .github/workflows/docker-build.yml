@@ -6,6 +6,7 @@ on:
       - feature/containerisation
       - feature/db-connection
       - feature/ci-integration-testing
+      - test/req-29-ci-validation
 
   pull_request:
     branches:
