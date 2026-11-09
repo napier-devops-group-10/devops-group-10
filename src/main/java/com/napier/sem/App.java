@@ -15,6 +15,17 @@ public class App {
      * Connection to MySQL database.
      */
     private Connection con = null;
+    /**
+     * Returns the existing database connection.
+     *
+     * Allows individual requirement classes to reuse
+     * the connection established by the application.
+     *
+     * @return Current database connection.
+     */
+    public Connection getConnection() {
+        return this.con;
+    }
 
     /**
      * Connect to the MySQL database with retry logic.
@@ -500,6 +511,12 @@ public class App {
         }
 
         // Disconnect from database
+        // REQ-26: Population of the World.
+// Reuse the existing MySQL connection managed by App.java.
+// Display the calculated population using Requirement26.
+        Requirement26 req26 = new Requirement26(app.getConnection());
+        req26.printWorldPopulation();
         app.disconnect();
+
     }
 }
