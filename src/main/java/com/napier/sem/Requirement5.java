@@ -41,15 +41,15 @@ public class Requirement5 {
             // Execute query
             ResultSet rset = pstmt.executeQuery();
 
-            // Unpack rows into Country objects
+            // Unpack rows into Country objects using setters
             while (rset.next()) {
                 Country cntry = new Country();
-                cntry.code = rset.getString("Code");
-                cntry.name = rset.getString("Name");
-                cntry.continent = rset.getString("Continent");
-                cntry.region = rset.getString("Region");
-                cntry.population = rset.getInt("Population");
-                cntry.capital = rset.getString("Capital");
+                cntry.setCode(rset.getString("Code"));
+                cntry.setName(rset.getString("Name"));
+                cntry.setContinent(rset.getString("Continent"));
+                cntry.setRegion(rset.getString("Region"));
+                cntry.setPopulation(rset.getInt("Population"));
+                cntry.setCapital(rset.getString("Capital"));
 
                 countries.add(cntry);
             }
@@ -72,11 +72,11 @@ public class Requirement5 {
 
         System.out.println("Code\tName\tContinent\tRegion\tPopulation");
         for (Country c : countries) {
-            System.out.println(c.code + "\t"
-                    + c.name + "\t"
-                    + c.continent + "\t"
-                    + c.region + "\t"
-                    + c.population);
+            System.out.println(c.getCode() + "\t"
+                    + c.getName() + "\t"
+                    + c.getContinent() + "\t"
+                    + c.getRegion() + "\t"
+                    + c.getPopulation());
         }
     }
 }
