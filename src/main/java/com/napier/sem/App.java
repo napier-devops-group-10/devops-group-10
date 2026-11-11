@@ -308,9 +308,6 @@ public class App {
         ArrayList<Country> top10Countries = app.getTopNCountriesWorld(10);
         app.printCountries(top10Countries, "REQ-04: Top 10 Populated Countries in the World");
 
-// ==========================================
-// TEST: Requirement 5
-// ==========================================
         System.out.println("\n--- Testing Requirement 5 ---");
         Requirement5 req5 = new Requirement5(app.con);
 
