@@ -344,23 +344,29 @@ public class App {
         // TEST: Requirement 5
         // ==========================================
         System.out.println("\n--- Testing Requirement 5 ---");
-        // Using app.getConnection() because con is encapsulated with private access
         Requirement5 req5 = new Requirement5(app.getConnection());
 
         // Test with Continent = "Europe" and N = 5
         ArrayList<Country> topEurope = req5.getTopNCountriesInContinent("Europe", 5);
-        req5.printCountries(topEurope);
+        req5.printCountries(topEurope, "Europe", 5);
 
         // Test with Continent = "Asia" and N = 3
         ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
-        req5.printCountries(topAsia);
+        req5.printCountries(topAsia, "Asia", 3);
+
+
         // ==========================================
+        // TEST: Requirement 6
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 6 ---");
+        Requirement6 req6 = new Requirement6(app.getConnection());
 
         String region = "Caribbean";
         int n = 5;
 
         ArrayList<Country> topCountries = req6.getTopCountriesInRegion(region, n);
         req6.printReport(topCountries, region, n);
+
 
         app.disconnect();
     }

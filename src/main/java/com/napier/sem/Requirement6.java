@@ -1,4 +1,3 @@
-// REQ-05 & REQ-06: Added country report classes and runner integration
 package com.napier.sem;
 
 import java.sql.Connection;
@@ -30,13 +29,13 @@ public class Requirement6 {
     public ArrayList<Country> getTopCountriesInRegion(String region, int n) {
         ArrayList<Country> countries = new ArrayList<>();
 
-        // Basic parameter validation
+        // Validate boundary conditions
         if (con == null || region == null || region.trim().isEmpty() || n <= 0) {
             System.out.println("Invalid input parameters or database connection is null.");
             return countries;
         }
 
-        // Query joins city to get the capital city name instead of just the ID
+        // Left join to city table to resolve the capital city name from city.ID
         String strSelect = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, "
                 + "       COALESCE(ci.Name, 'N/A') AS Capital "
                 + "FROM country c "
@@ -46,23 +45,20 @@ public class Requirement6 {
                 + "LIMIT ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(strSelect)) {
-            // Set query parameters safely
             pstmt.setString(1, region.trim());
             pstmt.setInt(2, n);
 
-            // Execute the query
             ResultSet rset = pstmt.executeQuery();
 
-            // Loop through results and map directly to Country fields
             while (rset.next()) {
                 Country c = new Country();
-                c.code = rset.getString("Code");
-                c.name = rset.getString("Name");
-                c.continent = rset.getString("Continent");
-                c.region = rset.getString("Region");
-                c.surfaceArea = rset.getDouble("SurfaceArea");
-                c.population = rset.getInt("Population");
-                c.capital = rset.getString("Capital");
+                c.setCode(rset.getString("Code"));
+                c.setName(rset.getString("Name"));
+                c.setContinent(rset.getString("Continent"));
+                c.setRegion(rset.getString("Region"));
+                c.setSurfaceArea(rset.getDouble("SurfaceArea"));
+                c.setPopulation(rset.getInt("Population"));
+                c.setCapital(rset.getString("Capital"));
 
                 countries.add(c);
             }
@@ -81,13 +77,11 @@ public class Requirement6 {
      * @param n         The number of countries requested.
      */
     public void printReport(ArrayList<Country> countries, String region, int n) {
-        // Check for empty results
         if (countries == null || countries.isEmpty()) {
             System.out.println("No countries found for region: " + region);
             return;
         }
 
-        // Print report header
         System.out.println();
         System.out.println("-----------------------------------------------------------------------------------------------------------------");
         System.out.println("Top " + n + " Populated Countries in Region: " + region);
@@ -96,16 +90,15 @@ public class Requirement6 {
                 "Code", "Name", "Continent", "Region", "Population", "Capital");
         System.out.println("-----------------------------------------------------------------------------------------------------------------");
 
-        // Print rows
         for (Country c : countries) {
             if (c != null) {
                 System.out.printf("%-6s %-35s %-20s %-25s %,12d %-20s%n",
-                        c.code,
-                        c.name,
-                        c.continent,
-                        c.region,
-                        c.population,
-                        c.capital);
+                        c.getCode(),
+                        c.getName(),
+                        c.getContinent(),
+                        c.getRegion(),
+                        c.getPopulation(),
+                        c.getCapital());
             }
         }
         System.out.println("-----------------------------------------------------------------------------------------------------------------\n");
