@@ -1,3 +1,4 @@
+
 package com.napier.sem;
 
 import java.sql.Connection;
@@ -355,6 +356,11 @@ public class App {
         ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
         req5.printCountries(topAsia);
         // ==========================================
+
+        // REQ-27: Total population of a continent.
+        // Reuse the existing database connection.
+        Requirement27 req27 = new Requirement27(app.getConnection());
+        req27.printContinentPopulation("Asia");
 
         // Disconnect cleanly from database
         app.disconnect();
