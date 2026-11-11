@@ -319,8 +319,16 @@ public class App {
         ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
         req5.printCountries(topAsia);
 // ==========================================
+// Run Requirement 6 with region = "Caribbean" and n = 5
 
-        // Disconnect
+        Requirement6 req6 = new Requirement6(app.con);
+
+        String region = "Caribbean";
+        int n = 5;
+
+        ArrayList<Country> topCountries = req6.getTopCountriesInRegion(region, n);
+        req6.printReport(topCountries, region, n);
+
         app.disconnect();
     }
 }
