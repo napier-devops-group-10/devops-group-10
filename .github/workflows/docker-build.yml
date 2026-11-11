@@ -3,6 +3,7 @@ name: Docker Build - Containerisation
 on:
   push:
     branches:
+      - develop
       - feature/containerisation
       - feature/db-connection
   pull_request:
