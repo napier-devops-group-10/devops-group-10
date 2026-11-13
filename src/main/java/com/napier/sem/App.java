@@ -9,12 +9,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
- * Main application class to manage database connection and execute population reports.
+ * Main application class responsible for managing database connections
+ * and executing population reporting queries for the World database.
  */
 public class App {
 
     /**
-     * Connection object to connect to the MySQL database.
+     * Active connection to the MySQL database.
      * Kept private to follow encapsulation guidelines.
      */
     private Connection con = null;
@@ -22,73 +23,72 @@ public class App {
     /**
      * Gets the active database connection.
      *
-     * @return Connection object.
+     * @return Active SQL Connection object.
      */
     public Connection getConnection() {
         return this.con;
     }
 
     /**
-     * Connect to the MySQL database with retry logic.
+     * Connects to the MySQL database using retry logic to handle container startup delays.
      *
-     * @param location The host:port location of the database.
-     * @param delay    Delay in milliseconds between retries.
+     * @param location The host and port where MySQL is running (e.g. 'localhost:3307' or 'db:3306').
+     * @param delay    Delay in milliseconds between connection retries.
      */
     public void connect(String location, int delay) {
+        // Step 1: Load the MySQL JDBC Driver class
         try {
-            // Load the MySQL JDBC Driver
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             System.err.println("Could not load SQL driver: " + e.getMessage());
             System.exit(-1);
         }
 
-        // Connection retry settings
+        // Step 2: Read database credentials from environment variables or use safe defaults
         int retries = 10;
         String user = System.getenv().getOrDefault("DB_USER", "population_user");
         String password = System.getenv().getOrDefault("DB_PASSWORD", "your_database_password");
         String database = System.getenv().getOrDefault("DB_NAME", "world");
         String url = "jdbc:mysql://" + location + "/" + database + "?allowPublicKeyRetrieval=true&useSSL=false";
 
-        // Try connecting in a loop to wait for the database container to start
+        // Step 3: Loop and retry connecting to allow MySQL container enough time to boot up
         for (int i = 0; i < retries; ++i) {
             System.out.println("Connecting to database at " + url + " (Attempt " + (i + 1) + "/" + retries + ")...");
             try {
-                // Wait for the DB service to be ready
+                // Wait before attempting connection
                 Thread.sleep(delay);
 
-                // Try to establish connection
+                // Open the database connection
                 con = DriverManager.getConnection(url, user, password);
                 System.out.println("Successfully connected to MySQL database: " + database);
                 break;
             } catch (SQLException sqle) {
                 System.err.println("Failed to connect to database attempt " + (i + 1) + ": " + sqle.getMessage());
             } catch (InterruptedException ie) {
-                System.err.println("Thread interrupted: " + ie.getMessage());
+                System.err.println("Thread sleep interrupted: " + ie.getMessage());
             }
         }
     }
 
     /**
-     * Disconnect cleanly from the MySQL database.
+     * Closes the active database connection cleanly.
      */
     public void disconnect() {
         if (con != null) {
             try {
-                // Close database connection
                 con.close();
                 System.out.println("Database connection closed cleanly.");
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.err.println("Error closing connection to database: " + e.getMessage());
             }
         }
     }
 
     /**
-     * Test query to retrieve a single country by its 3-letter code.
+     * Quick smoke test query to retrieve a single country by its 3-letter code.
      *
-     * @param code The country code (e.g. 'ESP').
-     * @return Country object or null if not found.
+     * @param code The 3-letter country code (e.g., 'ESP').
+     * @return A Country object if found, otherwise null.
      */
     public Country getCountry(String code) {
         if (con == null) {
@@ -97,24 +97,27 @@ public class App {
         }
 
         try {
-            // Simple SQL query to find one country
+            // Build simple select query
             Statement stmt = con.createStatement();
-            String strSelect = "SELECT Code, Name, Continent, Region, SurfaceArea, Population FROM country WHERE Code = '" + code + "'";
-            ResultSet rset = stmt.executeQuery(strSelect);
+            String sql = "SELECT Code, Name, Continent, Region, SurfaceArea, Population " +
+                    "FROM country " +
+                    "WHERE Code = '" + code + "'";
+            ResultSet rset = stmt.executeQuery(sql);
 
+            // If a row is returned, extract and set the country attributes
             if (rset.next()) {
-                Country c = new Country();
-                c.setCode(rset.getString("Code"));
-                c.setName(rset.getString("Name"));
-                c.setContinent(rset.getString("Continent"));
-                c.setRegion(rset.getString("Region"));
-                c.setSurfaceArea(rset.getDouble("SurfaceArea"));
-                c.setPopulation(rset.getInt("Population"));
-                return c;
+                Country country = new Country();
+                country.setCode(rset.getString("Code"));
+                country.setName(rset.getString("Name"));
+                country.setContinent(rset.getString("Continent"));
+                country.setRegion(rset.getString("Region"));
+                country.setSurfaceArea(rset.getDouble("SurfaceArea"));
+                country.setPopulation(rset.getInt("Population"));
+                return country;
             } else {
                 return null;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println("Failed to get country details: " + e.getMessage());
             return null;
         }
@@ -123,59 +126,176 @@ public class App {
     /**
      * REQ-01: Retrieves all countries in the world organised by largest population to smallest.
      *
-     * @return List of Country objects.
+     * @return List of all Country objects ordered by descending population.
      */
     public ArrayList<Country> getAllCountriesWorld() {
-        // Query joining country with city to get capital city name
+        ArrayList<Country> countries = new ArrayList<>();
+
+        if (con == null) {
+            System.err.println("Database connection is not established.");
+            return countries;
+        }
+
+        // Query joining country with city to resolve the capital city name
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
                 "FROM country c " +
                 "LEFT JOIN city ct ON c.Capital = ct.ID " +
                 "ORDER BY c.Population DESC";
-        return executeCountryQuery(sql, null);
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rset = stmt.executeQuery(sql);
+
+            // Loop through all database records
+            while (rset.next()) {
+                Country country = new Country();
+                country.setCode(rset.getString("Code"));
+                country.setName(rset.getString("Name"));
+                country.setContinent(rset.getString("Continent"));
+                country.setRegion(rset.getString("Region"));
+                country.setSurfaceArea(rset.getDouble("SurfaceArea"));
+                country.setPopulation(rset.getInt("Population"));
+
+                // Fallback for countries without an assigned capital city
+                String capitalName = rset.getString("Capital");
+                if (capitalName == null) {
+                    capitalName = "N/A";
+                }
+                country.setCapital(capitalName);
+
+                countries.add(country);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error executing REQ-01 query: " + e.getMessage());
+        }
+
+        return countries;
     }
 
     /**
-     * REQ-02: Retrieves all countries in a continent organised by largest population to smallest.
+     * REQ-02: Retrieves all countries in a specific continent organised by largest population to smallest.
      *
-     * @param continent The continent name to filter by (e.g. 'Europe').
-     * @return List of Country objects.
+     * @param continent The name of the continent (e.g., 'Europe', 'Asia').
+     * @return List of Country objects in the continent ordered by descending population.
      */
     public ArrayList<Country> getCountriesByContinent(String continent) {
+        ArrayList<Country> countries = new ArrayList<>();
+
+        // Validate input parameter
+        if (continent == null || continent.trim().isEmpty()) {
+            System.err.println("Continent parameter cannot be null or empty.");
+            return countries;
+        }
+
+        if (con == null) {
+            System.err.println("Database connection is not established.");
+            return countries;
+        }
+
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
                 "FROM country c " +
                 "LEFT JOIN city ct ON c.Capital = ct.ID " +
                 "WHERE c.Continent = ? " +
                 "ORDER BY c.Population DESC";
-        return executeCountryQuery(sql, continent);
+
+        try {
+            // Using PreparedStatement to prevent SQL injection
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, continent);
+            ResultSet rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Country country = new Country();
+                country.setCode(rset.getString("Code"));
+                country.setName(rset.getString("Name"));
+                country.setContinent(rset.getString("Continent"));
+                country.setRegion(rset.getString("Region"));
+                country.setSurfaceArea(rset.getDouble("SurfaceArea"));
+                country.setPopulation(rset.getInt("Population"));
+
+                String capitalName = rset.getString("Capital");
+                if (capitalName == null) {
+                    capitalName = "N/A";
+                }
+                country.setCapital(capitalName);
+
+                countries.add(country);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error executing REQ-02 query: " + e.getMessage());
+        }
+
+        return countries;
     }
 
     /**
-     * REQ-03: Retrieves all countries in a region organised by largest population to smallest.
+     * REQ-03: Retrieves all countries in a specific region organised by largest population to smallest.
      *
-     * @param region The region name to filter by (e.g. 'Western Europe').
-     * @return List of Country objects.
+     * @param region The name of the region (e.g., 'Western Europe', 'Caribbean').
+     * @return List of Country objects in the region ordered by descending population.
      */
     public ArrayList<Country> getCountriesByRegion(String region) {
+        ArrayList<Country> countries = new ArrayList<>();
+
+        // Validate input parameter
+        if (region == null || region.trim().isEmpty()) {
+            System.err.println("Region parameter cannot be null or empty.");
+            return countries;
+        }
+
+        if (con == null) {
+            System.err.println("Database connection is not established.");
+            return countries;
+        }
+
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
                 "FROM country c " +
                 "LEFT JOIN city ct ON c.Capital = ct.ID " +
                 "WHERE c.Region = ? " +
                 "ORDER BY c.Population DESC";
-        return executeCountryQuery(sql, region);
+
+        try {
+            // Using PreparedStatement for safe filtering
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, region);
+            ResultSet rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Country country = new Country();
+                country.setCode(rset.getString("Code"));
+                country.setName(rset.getString("Name"));
+                country.setContinent(rset.getString("Continent"));
+                country.setRegion(rset.getString("Region"));
+                country.setSurfaceArea(rset.getDouble("SurfaceArea"));
+                country.setPopulation(rset.getInt("Population"));
+
+                String capitalName = rset.getString("Capital");
+                if (capitalName == null) {
+                    capitalName = "N/A";
+                }
+                country.setCapital(capitalName);
+
+                countries.add(country);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error executing REQ-03 query: " + e.getMessage());
+        }
+
+        return countries;
     }
 
     /**
      * REQ-04: Retrieves the top N populated countries in the world where N is provided by the user.
      *
-     * @param n The number of top populated countries to retrieve.
-     * @return List of Country objects.
+     * @param n The number of countries to retrieve. Must be greater than 0.
+     * @return List containing up to N Country objects ordered by descending population.
      */
     public ArrayList<Country> getTopNCountriesWorld(int n) {
         ArrayList<Country> countries = new ArrayList<>();
 
-        // Validate that N is positive
+        // Validate that N is a positive integer
         if (n <= 0) {
-            System.out.println("Invalid value for N: " + n + ". Value must be greater than 0.");
+            System.err.println("Invalid value for N: " + n + ". N must be greater than zero.");
             return countries;
         }
 
@@ -191,12 +311,11 @@ public class App {
                 "LIMIT ?";
 
         try {
-            // Using prepared statement for the LIMIT parameter
+            // Parameterized LIMIT clause
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setInt(1, n);
             ResultSet rset = pstmt.executeQuery();
 
-            // Loop through results and populate country objects
             while (rset.next()) {
                 Country country = new Country();
                 country.setCode(rset.getString("Code"));
@@ -206,84 +325,42 @@ public class App {
                 country.setSurfaceArea(rset.getDouble("SurfaceArea"));
                 country.setPopulation(rset.getInt("Population"));
 
-                String capital = rset.getString("Capital");
-                if (capital == null) {
-                    capital = "N/A";
+                String capitalName = rset.getString("Capital");
+                if (capitalName == null) {
+                    capitalName = "N/A";
                 }
-                country.setCapital(capital);
+                country.setCapital(capitalName);
 
                 countries.add(country);
             }
         } catch (SQLException e) {
-            System.err.println("Error executing top N countries query: " + e.getMessage());
+            System.err.println("Error executing REQ-04 query: " + e.getMessage());
         }
+
         return countries;
     }
 
     /**
-     * Helper method to execute country SQL queries and map results to Country models.
+     * Prints a formatted table of Country records to the console.
      *
-     * @param sql       The SQL query string.
-     * @param parameter Optional parameter for WHERE clause.
-     * @return Populated ArrayList of Country instances.
-     */
-    private ArrayList<Country> executeCountryQuery(String sql, String parameter) {
-        ArrayList<Country> countries = new ArrayList<>();
-        if (con == null) {
-            System.err.println("Database connection is not established.");
-            return countries;
-        }
-
-        try {
-            PreparedStatement pstmt = con.prepareStatement(sql);
-            if (parameter != null) {
-                pstmt.setString(1, parameter);
-            }
-            ResultSet rset = pstmt.executeQuery();
-
-            while (rset.next()) {
-                Country country = new Country();
-                country.setCode(rset.getString("Code"));
-                country.setName(rset.getString("Name"));
-                country.setContinent(rset.getString("Continent"));
-                country.setRegion(rset.getString("Region"));
-                country.setSurfaceArea(rset.getDouble("SurfaceArea"));
-                country.setPopulation(rset.getInt("Population"));
-
-                String capital = rset.getString("Capital");
-                if (capital == null) {
-                    capital = "N/A";
-                }
-                country.setCapital(capital);
-
-                countries.add(country);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error executing country query: " + e.getMessage());
-        }
-        return countries;
-    }
-
-    /**
-     * Prints formatted country reporting table to standard output.
-     *
-     * @param countries   List of Country records to print.
-     * @param reportTitle Display title of the report.
+     * @param countries   The list of countries to display.
+     * @param reportTitle The header title for the printed report.
      */
     public void printCountries(ArrayList<Country> countries, String reportTitle) {
+        // Defensive check for null or empty list
         if (countries == null || countries.isEmpty()) {
             System.out.println("No countries found for report: " + reportTitle);
             return;
         }
 
-        // Table header
+        // Print table header
         System.out.println("\n=================================================================================================================================");
         System.out.println(" REPORT: " + reportTitle);
         System.out.println("=================================================================================================================================");
         System.out.printf("%-6s %-40s %-20s %-30s %-15s %-25s%n", "Code", "Name", "Continent", "Region", "Population", "Capital");
         System.out.println("---------------------------------------------------------------------------------------------------------------------------------");
 
-        // Print each row
+        // Print each country row
         for (Country country : countries) {
             System.out.printf("%-6s %-40s %-20s %-30s %-15d %-25s%n",
                     country.getCode(),
@@ -293,27 +370,34 @@ public class App {
                     country.getPopulation(),
                     country.getCapital());
         }
+
+        // Print footer summary
         System.out.println("Total records displayed: " + countries.size() + "\n");
     }
 
+    /**
+     * Application entry point.
+     *
+     * @param args Optional command-line arguments. First argument can override host:port location.
+     */
     public static void main(String[] args) {
         // Create new Application instance
         App app = new App();
 
-        // Database connection settings
+        // Configure connection target from environment or defaults
         String host = System.getenv().getOrDefault("DB_HOST", "localhost");
         String port = System.getenv().getOrDefault("DB_PORT", "3307");
         String location = host + ":" + port;
 
-        // Allow command line argument to override location (e.g. inside docker)
+        // Command-line argument override (useful when running inside docker or CI runner)
         if (args.length > 0) {
             location = args[0];
         }
 
-        // Connect to database (10 attempts, 3-second delay)
+        // Connect to database (10 attempts, 3000ms delay between attempts)
         app.connect(location, 3000);
 
-        // Verification query: smoke test for initial database connectivity
+        // Verification smoke test
         Country testCountry = app.getCountry("ESP");
         if (testCountry != null) {
             System.out.println("Smoke Test Successful! -> Code: " + testCountry.getCode() +
@@ -321,7 +405,7 @@ public class App {
                     ", Continent: " + testCountry.getContinent() +
                     ", Population: " + testCountry.getPopulation());
         } else {
-            System.out.println("Connection established, but no country data found with code ESP (Check if world.sql is populated).");
+            System.out.println("Smoke test: ESP not found. Verifying database population...");
         }
 
         // 1. REQ-01: All countries in the world ordered by population
@@ -354,7 +438,6 @@ public class App {
         ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
         req5.printCountries(topAsia, "Asia", 3);
 
-
         // ==========================================
         // TEST: Requirement 6
         // ==========================================
@@ -367,7 +450,7 @@ public class App {
         ArrayList<Country> topCountries = req6.getTopCountriesInRegion(region, n);
         req6.printReport(topCountries, region, n);
 
-
+        // Disconnect cleanly
         app.disconnect();
     }
 }
