@@ -557,6 +557,14 @@ public class App {
         ArrayList<String> continentPopulationBreakdown = req23.getContinentPopulationBreakdown();
         req23.printReport(continentPopulationBreakdown);
 
+        // ==========================================
+        // TEST: Requirement 24
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 24 ---");
+        Requirement24 req24 = new Requirement24(app.getConnection());
+        ArrayList<String> regionPopulationBreakdown = req24.getRegionPopulationBreakdown();
+        req24.printReport(regionPopulationBreakdown);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
