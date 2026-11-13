@@ -587,6 +587,14 @@ public class App {
         Requirement31 req31 = new Requirement31(app.getConnection());
         req31.printCityPopulation("Palma de Mallorca");
 
+        // ==========================================
+        // TEST: Requirement 32
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 32 ---");
+        Requirement32 req32 = new Requirement32(app.getConnection());
+        ArrayList<String> languagePopulationReport = req32.getLanguagePopulationReport();
+        req32.printReport(languagePopulationReport);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
