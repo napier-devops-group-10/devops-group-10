@@ -461,6 +461,14 @@ public class App {
         Requirement26 req26 = new Requirement26(app.getConnection());
         req26.printWorldPopulation();
 
+        // ==========================================
+        // TEST: Requirement 11
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 11 ---");
+        Requirement11 req11 = new Requirement11(app.getConnection());
+        ArrayList<City> balearesCities = req11.getCitiesInDistrict("Baleares");
+        req11.printCities(balearesCities, "Baleares");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
