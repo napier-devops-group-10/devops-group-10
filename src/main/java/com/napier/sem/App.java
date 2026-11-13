@@ -509,6 +509,14 @@ public class App {
         ArrayList<City> top3CitiesGelderland = req16.getTopNCitiesInDistrict("Gelderland", 3);
         req16.printCities(top3CitiesGelderland, "Gelderland", 3);
 
+        // ==========================================
+        // TEST: Requirement 17
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 17 ---");
+        Requirement17 req17 = new Requirement17(app.getConnection());
+        ArrayList<City> worldCapitalCities = req17.getAllCapitalCitiesWorld();
+        req17.printCapitalCities(worldCapitalCities);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
