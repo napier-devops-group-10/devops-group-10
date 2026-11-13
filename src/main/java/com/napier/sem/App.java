@@ -611,6 +611,14 @@ public class App {
         ArrayList<City> westernEuropeCities = req9.getCitiesInRegion("Western Europe");
         req9.printCities(westernEuropeCities, "Western Europe");
 
+        // ==========================================
+        // TEST: Requirement 10
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 10 ---");
+        Requirement10 req10 = new Requirement10(app.getConnection());
+        ArrayList<City> spainCities = req10.getCitiesInCountry("Spain");
+        req10.printCities(spainCities, "Spain");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
