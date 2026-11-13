@@ -580,6 +580,13 @@ public class App {
         Requirement30 req30 = new Requirement30(app.getConnection());
         req30.printDistrictPopulation("Baleares");
 
+        // ==========================================
+        // TEST: Requirement 31
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 31 ---");
+        Requirement31 req31 = new Requirement31(app.getConnection());
+        req31.printCityPopulation("Palma de Mallorca");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
