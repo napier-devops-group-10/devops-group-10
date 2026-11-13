@@ -2,29 +2,29 @@ package com.napier.sem;
 
 /**
  * Represents a Country record from the world database.
- * Attributes are encapsulated with private access and getters/setters.
+ * Fields are encapsulated using private access modifiers with getters and setters.
  */
 public class Country {
 
-    // 3-letter country code (Primary key)
+    // Unique 3-letter country code (Primary Key, e.g., 'ESP')
     private String code;
 
-    // Name of the country
+    // Full country name (e.g., 'Spain')
     private String name;
 
-    // Continent where the country is located
+    // Continent name where the country is located
     private String continent;
 
-    // Geographic region of the country
+    // Geographic sub-region
     private String region;
 
-    // Surface area in square kilometers
+    // Total land surface area in square kilometres
     private double surfaceArea;
 
-    // Total population
+    // Total population count
     private int population;
 
-    // Capital city name
+    // Name of the capital city (obtained via JOIN with the city table)
     private String capital;
 
     /**

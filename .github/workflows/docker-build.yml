@@ -3,8 +3,11 @@ name: Docker Build - Containerisation
 on:
   push:
     branches:
+      - develop
       - feature/containerisation
       - feature/db-connection
+      - feature/ci-integration-testing
+
   pull_request:
     branches:
       - develop
@@ -12,6 +15,17 @@ on:
 jobs:
   docker-build:
     runs-on: ubuntu-latest
+
+    env:
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+
+      DB_HOST: localhost
+      DB_PORT: "3307"
+      DB_NAME: world
+      DB_USER: ${{ secrets.MYSQL_USER }}
+      DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -24,12 +38,42 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build Java application
-        run: mvn -B clean package -DskipTests
+      - name: Start MySQL database
+        run: docker compose up -d db
 
-      - name: Test Docker Compose services with Secrets
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        run: docker compose up --build --abort-on-container-exit --exit-code-from app
+      - name: Wait for MySQL to become healthy
+        shell: bash
+        run: |
+          for i in {1..30}; do
+            CONTAINER_ID=$(docker compose ps -q db)
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER_ID")
+
+            if [ "$STATUS" = "healthy" ]; then
+              echo "MySQL is healthy."
+              exit 0
+            fi
+
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+
+          echo "MySQL did not become healthy."
+          docker compose logs db
+          exit 1
+
+      - name: Run unit and integration tests
+        run: mvn -B clean verify
+
+      - name: Build Docker application
+        run: docker compose build app
+
+      - name: Run Docker application
+        run: docker compose up --no-build --abort-on-container-exit --exit-code-from app app
+
+      - name: Display Docker logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down -v
