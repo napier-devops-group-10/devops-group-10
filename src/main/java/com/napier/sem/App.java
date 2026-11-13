@@ -595,6 +595,14 @@ public class App {
         ArrayList<String> languagePopulationReport = req32.getLanguagePopulationReport();
         req32.printReport(languagePopulationReport);
 
+        // ==========================================
+        // TEST: Requirement 8
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 8 ---");
+        Requirement8 req8 = new Requirement8(app.getConnection());
+        ArrayList<City> europeCities = req8.getCitiesInContinent("Europe");
+        req8.printCities(europeCities, "Europe");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
