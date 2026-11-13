@@ -10,7 +10,9 @@ RUN mvn dependency:go-offline
 
 # Copy the Java source code and build the executable JAR
 COPY src ./src
-RUN mvn clean package
+# Package the application without running tests.
+# GitHub Actions will execute unit and integration tests separately.
+RUN mvn clean package -DskipTests
 
 
 # Stage 2: Run the application using Java 17
