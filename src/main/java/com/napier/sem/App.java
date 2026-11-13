@@ -565,6 +565,14 @@ public class App {
         ArrayList<String> regionPopulationBreakdown = req24.getRegionPopulationBreakdown();
         req24.printReport(regionPopulationBreakdown);
 
+        // ==========================================
+        // TEST: Requirement 25
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 25 ---");
+        Requirement25 req25 = new Requirement25(app.getConnection());
+        ArrayList<String> countryPopulationBreakdown = req25.getCountryPopulationBreakdown();
+        req25.printReport(countryPopulationBreakdown);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
