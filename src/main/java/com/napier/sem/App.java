@@ -573,6 +573,13 @@ public class App {
         ArrayList<String> countryPopulationBreakdown = req25.getCountryPopulationBreakdown();
         req25.printReport(countryPopulationBreakdown);
 
+        // ==========================================
+        // TEST: Requirement 30
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 30 ---");
+        Requirement30 req30 = new Requirement30(app.getConnection());
+        req30.printDistrictPopulation("Baleares");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
