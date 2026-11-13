@@ -549,6 +549,14 @@ public class App {
         ArrayList<City> top3CapitalCitiesWesternEurope = req22.getTopNCapitalCitiesInRegion("Western Europe", 3);
         req22.printCapitalCities(top3CapitalCitiesWesternEurope, "Western Europe", 3);
 
+        // ==========================================
+        // TEST: Requirement 23
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 23 ---");
+        Requirement23 req23 = new Requirement23(app.getConnection());
+        ArrayList<String> continentPopulationBreakdown = req23.getContinentPopulationBreakdown();
+        req23.printReport(continentPopulationBreakdown);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
