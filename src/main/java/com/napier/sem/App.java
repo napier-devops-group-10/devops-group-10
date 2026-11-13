@@ -456,6 +456,11 @@ public class App {
         Requirement27 req27 = new Requirement27(app.getConnection());
         req27.printContinentPopulation("Asia");
 
+        // REQ-26: Total population of the world.
+        // Reuse the existing database connection.
+        Requirement26 req26 = new Requirement26(app.getConnection());
+        req26.printWorldPopulation();
+
         // Disconnect cleanly from database
         app.disconnect();
     }
