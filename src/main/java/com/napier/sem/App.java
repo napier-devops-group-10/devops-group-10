@@ -603,6 +603,14 @@ public class App {
         ArrayList<City> europeCities = req8.getCitiesInContinent("Europe");
         req8.printCities(europeCities, "Europe");
 
+        // ==========================================
+        // TEST: Requirement 9
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 9 ---");
+        Requirement9 req9 = new Requirement9(app.getConnection());
+        ArrayList<City> westernEuropeCities = req9.getCitiesInRegion("Western Europe");
+        req9.printCities(westernEuropeCities, "Western Europe");
+
         // Disconnect cleanly from database
         app.disconnect();
     }
