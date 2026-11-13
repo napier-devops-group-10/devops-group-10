@@ -477,6 +477,14 @@ public class App {
         ArrayList<City> top10CitiesWorld = req12.getTopNCitiesWorld(10);
         req12.printCities(top10CitiesWorld, 10);
 
+        // ==========================================
+        // TEST: Requirement 13
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 13 ---");
+        Requirement13 req13 = new Requirement13(app.getConnection());
+        ArrayList<City> top5CitiesEurope = req13.getTopNCitiesInContinent("Europe", 5);
+        req13.printCities(top5CitiesEurope, "Europe", 5);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
