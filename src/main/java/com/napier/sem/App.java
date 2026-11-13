@@ -501,6 +501,14 @@ public class App {
         ArrayList<City> top5CitiesSpain = req15.getTopNCitiesInCountry("Spain", 5);
         req15.printCities(top5CitiesSpain, "Spain", 5);
 
+        // ==========================================
+        // TEST: Requirement 16
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 16 ---");
+        Requirement16 req16 = new Requirement16(app.getConnection());
+        ArrayList<City> top3CitiesGelderland = req16.getTopNCitiesInDistrict("Gelderland", 3);
+        req16.printCities(top3CitiesGelderland, "Gelderland", 3);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
