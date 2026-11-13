@@ -469,6 +469,14 @@ public class App {
         ArrayList<City> balearesCities = req11.getCitiesInDistrict("Baleares");
         req11.printCities(balearesCities, "Baleares");
 
+        // ==========================================
+        // TEST: Requirement 12
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 12 ---");
+        Requirement12 req12 = new Requirement12(app.getConnection());
+        ArrayList<City> top10CitiesWorld = req12.getTopNCitiesWorld(10);
+        req12.printCities(top10CitiesWorld, 10);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
