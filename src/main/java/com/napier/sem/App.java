@@ -16,8 +16,18 @@ public class App {
 
     /**
      * Active connection to the MySQL database.
+     * Kept private to follow encapsulation guidelines.
      */
     private Connection con = null;
+
+    /**
+     * Gets the active database connection.
+     *
+     * @return Active SQL Connection object.
+     */
+    public Connection getConnection() {
+        return this.con;
+    }
 
     /**
      * Connects to the MySQL database using retry logic to handle container startup delays.
@@ -81,7 +91,6 @@ public class App {
      * @return A Country object if found, otherwise null.
      */
     public Country getCountry(String code) {
-        // Check if database is connected
         if (con == null) {
             System.err.println("Database connection is not established.");
             return null;
@@ -91,8 +100,8 @@ public class App {
             // Build simple select query
             Statement stmt = con.createStatement();
             String sql = "SELECT Code, Name, Continent, Region, SurfaceArea, Population " +
-                         "FROM country " +
-                         "WHERE Code = '" + code + "'";
+                    "FROM country " +
+                    "WHERE Code = '" + code + "'";
             ResultSet rset = stmt.executeQuery(sql);
 
             // If a row is returned, extract and set the country attributes
@@ -129,9 +138,9 @@ public class App {
 
         // Query joining country with city to resolve the capital city name
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
-                     "FROM country c " +
-                     "LEFT JOIN city ct ON c.Capital = ct.ID " +
-                     "ORDER BY c.Population DESC";
+                "FROM country c " +
+                "LEFT JOIN city ct ON c.Capital = ct.ID " +
+                "ORDER BY c.Population DESC";
 
         try {
             Statement stmt = con.createStatement();
@@ -184,10 +193,10 @@ public class App {
         }
 
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
-                     "FROM country c " +
-                     "LEFT JOIN city ct ON c.Capital = ct.ID " +
-                     "WHERE c.Continent = ? " +
-                     "ORDER BY c.Population DESC";
+                "FROM country c " +
+                "LEFT JOIN city ct ON c.Capital = ct.ID " +
+                "WHERE c.Continent = ? " +
+                "ORDER BY c.Population DESC";
 
         try {
             // Using PreparedStatement to prevent SQL injection
@@ -240,10 +249,10 @@ public class App {
         }
 
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
-                     "FROM country c " +
-                     "LEFT JOIN city ct ON c.Capital = ct.ID " +
-                     "WHERE c.Region = ? " +
-                     "ORDER BY c.Population DESC";
+                "FROM country c " +
+                "LEFT JOIN city ct ON c.Capital = ct.ID " +
+                "WHERE c.Region = ? " +
+                "ORDER BY c.Population DESC";
 
         try {
             // Using PreparedStatement for safe filtering
@@ -296,10 +305,10 @@ public class App {
         }
 
         String sql = "SELECT c.Code, c.Name, c.Continent, c.Region, c.SurfaceArea, c.Population, ct.Name AS Capital " +
-                     "FROM country c " +
-                     "LEFT JOIN city ct ON c.Capital = ct.ID " +
-                     "ORDER BY c.Population DESC " +
-                     "LIMIT ?";
+                "FROM country c " +
+                "LEFT JOIN city ct ON c.Capital = ct.ID " +
+                "ORDER BY c.Population DESC " +
+                "LIMIT ?";
 
         try {
             // Parameterized LIMIT clause
@@ -372,6 +381,7 @@ public class App {
      * @param args Optional command-line arguments. First argument can override host:port location.
      */
     public static void main(String[] args) {
+        // Create new Application instance
         App app = new App();
 
         // Configure connection target from environment or defaults
@@ -390,7 +400,10 @@ public class App {
         // Verification smoke test
         Country testCountry = app.getCountry("ESP");
         if (testCountry != null) {
-            System.out.println("Smoke test passed: " + testCountry.getCode() + " - " + testCountry.getName() + " found.");
+            System.out.println("Smoke Test Successful! -> Code: " + testCountry.getCode() +
+                    ", Name: " + testCountry.getName() +
+                    ", Continent: " + testCountry.getContinent() +
+                    ", Population: " + testCountry.getPopulation());
         } else {
             System.out.println("Smoke test: ESP not found. Verifying database population...");
         }
@@ -407,9 +420,35 @@ public class App {
         ArrayList<Country> westernEuropeCountries = app.getCountriesByRegion("Western Europe");
         app.printCountries(westernEuropeCountries, "REQ-03: Countries in Western Europe by Population");
 
-        // 4. REQ-04: Top 10 populated countries in the world
+        // 4. REQ-04: Top N populated countries in the world (N = 10)
         ArrayList<Country> top10Countries = app.getTopNCountriesWorld(10);
         app.printCountries(top10Countries, "REQ-04: Top 10 Populated Countries in the World");
+
+        // ==========================================
+        // TEST: Requirement 5
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 5 ---");
+        Requirement5 req5 = new Requirement5(app.getConnection());
+
+        // Test with Continent = "Europe" and N = 5
+        ArrayList<Country> topEurope = req5.getTopNCountriesInContinent("Europe", 5);
+        req5.printCountries(topEurope, "Europe", 5);
+
+        // Test with Continent = "Asia" and N = 3
+        ArrayList<Country> topAsia = req5.getTopNCountriesInContinent("Asia", 3);
+        req5.printCountries(topAsia, "Asia", 3);
+
+        // ==========================================
+        // TEST: Requirement 6
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 6 ---");
+        Requirement6 req6 = new Requirement6(app.getConnection());
+
+        String region = "Caribbean";
+        int n = 5;
+
+        ArrayList<Country> topCountries = req6.getTopCountriesInRegion(region, n);
+        req6.printReport(topCountries, region, n);
 
         // Disconnect cleanly
         app.disconnect();
