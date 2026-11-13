@@ -525,6 +525,14 @@ public class App {
         ArrayList<City> westernEuropeCapitals = req19.getCapitalCitiesInRegion("Western Europe");
         req19.printCapitalCities(westernEuropeCapitals, "Western Europe");
 
+        // ==========================================
+        // TEST: Requirement 20
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 20 ---");
+        Requirement20 req20 = new Requirement20(app.getConnection());
+        ArrayList<City> top10CapitalCitiesWorld = req20.getTopNCapitalCitiesWorld(10);
+        req20.printCapitalCities(top10CapitalCitiesWorld, 10);
+
         // Disconnect cleanly from database
         app.disconnect();
     }
