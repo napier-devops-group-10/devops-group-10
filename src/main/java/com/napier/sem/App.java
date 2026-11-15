@@ -367,7 +367,12 @@ public class App {
         Requirement32 req32 = new Requirement32(app.getConnection());
         ArrayList<String> languagePopulationReport = req32.getLanguagePopulationReport();
         req32.printReport(languagePopulationReport);
-
+        // ==========================================
+        // REQ-28: Total Population of a Region
+        // ==========================================
+        System.out.println("\n--- Testing Requirement 28 ---");
+        Requirement28 req28 = new Requirement28(app.getConnection());
+        req28.printRegionPopulation("Caribbean");
         // Disconnect cleanly from database
         app.disconnect();
     }
