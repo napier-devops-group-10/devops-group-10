@@ -1,3 +1,4 @@
+
 package com.napier.sem;
 
 import java.sql.Connection;
@@ -367,6 +368,10 @@ public class App {
         ArrayList<Country> topCountries = req6.getTopCountriesInRegion(region, n);
         req6.printReport(topCountries, region, n);
 
+
+        // REQ-28: Total population of a region.
+        Requirement28 req28 = new Requirement28(app.getConnection());
+        req28.printRegionPopulation("Caribbean");
 
         app.disconnect();
     }
