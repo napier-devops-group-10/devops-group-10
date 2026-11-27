@@ -1,14 +1,19 @@
-
 package com.napier.sem;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * JUnit tests for REQ-27: Population of a Continent.
@@ -22,6 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * Integration testing uses environment variables to avoid
  * storing database credentials directly in source code.
+ *
+ * Additional Mockito tests verify successful queries,
+ * invalid inputs, missing results, SQL exceptions,
+ * and formatted population reports.
  */
 public class Requirement27Test {
 
@@ -176,6 +185,454 @@ public class Requirement27Test {
                     "Database integration test failed: "
                             + e.getMessage()
             );
+        }
+    }
+
+    /**
+     * Verifies that a valid continent returns the correct
+     * population when the database query succeeds.
+     *
+     * Mockito simulates the database connection,
+     * prepared statement and result set.
+     */
+    @Test
+    void testValidContinentPopulation() throws SQLException {
+
+        // Create mocked JDBC objects.
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        // Configure the expected database operations.
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(true);
+
+        when(resultSet.getLong("ContinentPopulation"))
+                .thenReturn(3705025700L);
+
+        when(resultSet.wasNull())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        // Verify that the population is returned correctly.
+        long population = report.getContinentPopulation("Asia");
+
+        assertEquals(3705025700L, population);
+
+        // Verify the correct continent was supplied.
+        verify(statement).setString(1, "Asia");
+
+        // Verify that the database query was executed.
+        verify(statement).executeQuery();
+    }
+
+    /**
+     * Verifies that a null continent is rejected when
+     * a database connection is available.
+     *
+     * This exercises the input validation branch
+     * independently of the null connection check.
+     */
+    @Test
+    void testNullContinentWithConnection() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation(null)
+        );
+
+        // Invalid input must not execute SQL.
+        verify(connection, never())
+                .prepareStatement(anyString());
+    }
+
+    /**
+     * Verifies that an empty continent name is rejected
+     * before attempting database access.
+     */
+    @Test
+    void testEmptyContinentWithConnection() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("")
+        );
+
+        verify(connection, never())
+                .prepareStatement(anyString());
+    }
+
+    /**
+     * Verifies that whitespace-only continent names
+     * are rejected as invalid input.
+     */
+    @Test
+    void testWhitespaceContinentWithConnection() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("   ")
+        );
+
+        verify(connection, never())
+                .prepareStatement(anyString());
+    }
+
+    /**
+     * Verifies that surrounding whitespace is removed
+     * before the continent name is passed to SQL.
+     */
+    @Test
+    void testContinentNameTrimmed() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(true);
+
+        when(resultSet.getLong("ContinentPopulation"))
+                .thenReturn(3705025700L);
+
+        when(resultSet.wasNull())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        long population =
+                report.getContinentPopulation("  Asia  ");
+
+        assertEquals(3705025700L, population);
+
+        // Verify that whitespace was removed.
+        verify(statement).setString(1, "Asia");
+    }
+
+    /**
+     * Verifies that a NULL population result from
+     * SQL SUM() is handled correctly.
+     *
+     * SQL SUM() can return NULL when no matching
+     * country population records exist.
+     */
+    @Test
+    void testNullPopulationResult() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(true);
+
+        when(resultSet.getLong("ContinentPopulation"))
+                .thenReturn(0L);
+
+        when(resultSet.wasNull())
+                .thenReturn(true);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("Unknown")
+        );
+    }
+
+    /**
+     * Verifies that a query returning no result rows
+     * produces the expected failure value.
+     */
+    @Test
+    void testNoPopulationResults() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        // Simulate an empty database result.
+        when(resultSet.next())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("Unknown")
+        );
+    }
+
+    /**
+     * Verifies that SQL exceptions during statement
+     * preparation are handled without crashing.
+     */
+    @Test
+    void testPreparedStatementException() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+
+        // Simulate failure while preparing SQL.
+        when(connection.prepareStatement(anyString()))
+                .thenThrow(
+                        new SQLException("Statement preparation failed")
+                );
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("Asia")
+        );
+    }
+
+    /**
+     * Verifies that SQL exceptions during query
+     * execution return the expected failure value.
+     */
+    @Test
+    void testQueryExecutionException() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        // Simulate failure during SQL execution.
+        when(statement.executeQuery())
+                .thenThrow(
+                        new SQLException("Query execution failed")
+                );
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("Asia")
+        );
+    }
+
+    /**
+     * Verifies that SQL exceptions while reading
+     * database results are handled safely.
+     */
+    @Test
+    void testResultSetException() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        // Simulate a database error while reading results.
+        when(resultSet.next())
+                .thenThrow(
+                        new SQLException("ResultSet processing failed")
+                );
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                -1L,
+                report.getContinentPopulation("Asia")
+        );
+    }
+
+    /**
+     * Verifies that a zero population is treated
+     * as a valid SQL result when it is not NULL.
+     */
+    @Test
+    void testZeroPopulation() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(true);
+
+        when(resultSet.getLong("ContinentPopulation"))
+                .thenReturn(0L);
+
+        when(resultSet.wasNull())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        assertEquals(
+                0L,
+                report.getContinentPopulation("Asia")
+        );
+    }
+
+    /**
+     * Verifies that the SQL query uses a parameterised
+     * PreparedStatement and the expected population calculation.
+     */
+    @Test
+    void testPopulationSQLQuery() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        report.getContinentPopulation("Europe");
+
+        // Capture the SQL query supplied to PreparedStatement.
+        org.mockito.ArgumentCaptor<String> queryCaptor =
+                org.mockito.ArgumentCaptor.forClass(String.class);
+
+        verify(connection)
+                .prepareStatement(queryCaptor.capture());
+
+        String sql = queryCaptor.getValue();
+
+        // Verify the population aggregation and parameter.
+        assertTrue(sql.contains("SUM(Population)"));
+        assertTrue(sql.contains("FROM country"));
+        assertTrue(sql.contains("Continent = ?"));
+
+        verify(statement).setString(1, "Europe");
+    }
+
+    /**
+     * Verifies that a successful population report
+     * prints the continent and formatted population.
+     */
+    @Test
+    void testPrintContinentPopulationSuccess() throws SQLException {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+
+        when(connection.prepareStatement(anyString()))
+                .thenReturn(statement);
+
+        when(statement.executeQuery())
+                .thenReturn(resultSet);
+
+        when(resultSet.next())
+                .thenReturn(true);
+
+        when(resultSet.getLong("ContinentPopulation"))
+                .thenReturn(3705025700L);
+
+        when(resultSet.wasNull())
+                .thenReturn(false);
+
+        Requirement27 report = new Requirement27(connection);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+
+            report.printContinentPopulation("Asia");
+
+            String printed = output.toString();
+
+            // Verify the successful report output.
+            assertTrue(
+                    printed.contains("Population of Asia:")
+            );
+
+            assertTrue(
+                    printed.contains("3,705,025,700")
+            );
+
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    /**
+     * Verifies that an unavailable population
+     * produces an informative message.
+     */
+    @Test
+    void testPrintContinentPopulationUnavailable() {
+
+        Requirement27 report = new Requirement27(null);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+
+            report.printContinentPopulation("Asia");
+
+            String printed = output.toString();
+
+            assertTrue(
+                    printed.contains("Population unavailable for: Asia")
+            );
+
+        } finally {
+            System.setOut(originalOut);
         }
     }
 }
