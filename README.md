@@ -486,6 +486,14 @@ SET09803 DevOps – Group 10
 
 ---
 
+## Documentation
+
+For detailed information about the application's population reporting requirements and their implementations, see:
+
+- [Population Reporting Requirements](docs/Requirements.md) – Documentation of Requirements 1–32, including their purpose, implementation details and main methods.
+
+---
+
 ## Version
 
 **README Version:** 1.0  
