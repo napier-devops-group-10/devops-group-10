@@ -215,3 +215,72 @@ Requirements 17–22 focus specifically on capital city population reports. Requ
 
 ---
 
+## 5. Urban and Rural Population Reports (Requirements 23–25)
+
+These requirements provide population breakdowns showing the total population, the population living in cities, and the population not living in cities. Each report also calculates the percentage of the total population living in and outside cities.
+
+---
+
+### Requirement 23 – Population Breakdown by Continent
+
+**Purpose:** Display the total population, population living in cities, and population not living in cities for each continent.
+
+**Implementation:**
+- Retrieves population information from the `country` and `city` tables.
+- Uses a subquery to calculate the total city population for each country before joining it to the country table.
+- Groups the results by continent.
+- Calculates the population not living in cities by subtracting the city population from the total population.
+- Calculates the percentage of the population living in and outside cities.
+- Orders the results by total population in descending order.
+
+**Main methods:**
+- `getContinentPopulationBreakdown()` – retrieves and formats the population breakdown for each continent.
+- `printReport(ArrayList<String> rows)` – displays the formatted report.
+
+### Requirement 24 – Population Breakdown by Region
+
+**Purpose:** Display the total population, population living in cities, and population not living in cities for each region.
+
+**Implementation:**
+- Retrieves population information from the `country` and `city` tables.
+- Uses a subquery to calculate the total city population for each country before joining it to the country table.
+- Groups the results by region.
+- Calculates the population not living in cities by subtracting the city population from the total population.
+- Calculates the percentage of the population living in and outside cities.
+- Orders the results by total population in descending order.
+
+**Main methods:**
+- `getRegionPopulationBreakdown()` – retrieves and formats the population breakdown for each region.
+- `printReport(ArrayList<String> rows)` – displays the formatted report.
+
+### Requirement 25 – Population Breakdown by Country
+
+**Purpose:** Display the total population, population living in cities, and population not living in cities for each country.
+
+**Implementation:**
+- Retrieves population information from the `country` and `city` tables.
+- Uses a subquery to calculate the total city population for each country before joining it to the country table.
+- Uses a `LEFT JOIN` to ensure countries without matching city records are still included.
+- Calculates the population not living in cities by subtracting the city population from the total population.
+- Calculates the percentage of the population living in and outside cities.
+- Orders the results by total population in descending order.
+
+**Main methods:**
+- `getCountryPopulationBreakdown()` – retrieves and formats the population breakdown for each country.
+- `printReport(ArrayList<String> rows)` – displays the formatted report.
+
+**Implementation note:** All three classes receive an active database connection through their constructors. They check whether the connection is available before executing their queries. If the query fails, an SQL error is reported. If no report data is available, the print method displays an appropriate message.
+
+## Summary
+
+Urban and Rural Population Reports (Requirements 23–25)
+Requirements 23–25 focus on showing how a population is distributed between people living in cities (urban population) and people not living in cities (rural population).
+- Requirement 23: Displays the total, urban and rural population for each continent.
+- Requirement 24: Displays the total, urban and rural population for each region.
+- Requirement 25: Displays the total, urban and rural population for each country.
+  All three requirements use data from the country and city tables. They calculate the urban population by adding the populations of cities, then calculate the rural population by subtracting the urban population from the total population. They also calculate the percentages of people living in and outside cities.
+
+The reports are ordered by total population in descending order and use a subquery and LEFT JOIN to ensure population figures are aggregated correctly and countries without city records are included.
+
+---
+
