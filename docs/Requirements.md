@@ -74,7 +74,7 @@ This group of requirements focuses on retrieving information about cities and th
 
 ---
 
-### Requirement 7 – All Cities in the World
+### Requirement 7: All Cities in the World
 
 **Class:** `Requirement7.java`
 
@@ -82,7 +82,7 @@ Retrieves all cities stored in the database and organises them in descending ord
 
 The report displays each city's name, country code, district and population.
 
-### Requirement 8 – All Cities in a Continent
+### Requirement 8: All Cities in a Continent
 
 **Class:** `Requirement8.java`
 
@@ -90,7 +90,7 @@ Retrieves all cities located within a specified continent. The class joins the `
 
 **Input:** Continent name.
 
-### Requirement 9 – All Cities in a Region
+### Requirement 9: All Cities in a Region
 
 **Class:** `Requirement9.java`
 
@@ -98,7 +98,7 @@ Retrieves all cities located within a specified geographical region. The class j
 
 **Input:** Region name.
 
-### Requirement 10 – All Cities in a Country
+### Requirement 10: All Cities in a Country
 
 **Class:** `Requirement10.java`
 
@@ -106,7 +106,7 @@ Retrieves all cities belonging to a specified country. The class joins the `city
 
 **Input:** Country name.
 
-### Requirement 11 – All Cities in a District
+### Requirement 11: All Cities in a District
 
 **Class:** `Requirement11.java`
 
@@ -114,7 +114,7 @@ Retrieves all cities located within a specified district. The class filters the 
 
 **Input:** District name.
 
-### Requirement 12 – Top N Populated Cities in the World
+### Requirement 12: Top N Populated Cities in the World
 
 **Class:** `Requirement12.java`
 
@@ -122,7 +122,7 @@ Retrieves the top N most populated cities in the world. The number of cities ret
 
 **Input:** Number of cities (N).
 
-### Requirement 13 – Top N Populated Cities in a Continent
+### Requirement 13: Top N Populated Cities in a Continent
 
 **Class:** `Requirement13.java`
 
@@ -130,7 +130,7 @@ Retrieves the top N most populated cities within a specified continent. The clas
 
 **Inputs:** Continent name and number of cities (N).
 
-### Requirement 14 – Top N Populated Cities in a Region
+### Requirement 14: Top N Populated Cities in a Region
 
 **Class:** `Requirement14.java`
 
@@ -138,7 +138,7 @@ Retrieves the top N most populated cities within a specified geographical region
 
 **Inputs:** Region name and number of cities (N).
 
-### Requirement 15 – Top N Populated Cities in a Country
+### Requirement 15: Top N Populated Cities in a Country
 
 **Class:** `Requirement15.java`
 
@@ -146,7 +146,7 @@ Retrieves the top N most populated cities within a specified country. The class 
 
 **Inputs:** Country name and number of cities (N).
 
-### Requirement 16 – Top N Populated Cities in a District
+### Requirement 16: Top N Populated Cities in a District
 
 **Class:** `Requirement16.java`
 
@@ -171,13 +171,13 @@ The application identifies capital cities by joining the `city` and `country` ta
 
 ---
 
-### Requirement 17 – All Capital Cities in the World
+### Requirement 17: All Capital Cities in the World
 
 **Class:** `Requirement17.java`
 
 Retrieves all capital cities stored in the database and organises them in descending order of population. The report displays the name, country code, district and population of each capital city.
 
-### Requirement 19 – All Capital Cities in a Region
+### Requirement 19: All Capital Cities in a Region
 
 **Class:** `Requirement19.java`
 
@@ -185,7 +185,7 @@ Retrieves all capital cities located within a specified geographical region. The
 
 **Input:** Region name.
 
-### Requirement 20 – Top N Populated Capital Cities in the World
+### Requirement 20: Top N Populated Capital Cities in the World
 
 **Class:** `Requirement20.java`
 
@@ -193,7 +193,7 @@ Retrieves the top N most populated capital cities in the world. The number of ca
 
 **Input:** Number of capital cities (N).
 
-### Requirement 21 – Top N Populated Capital Cities in a Continent
+### Requirement 21: Top N Populated Capital Cities in a Continent
 
 **Class:** `Requirement21.java`
 
@@ -201,7 +201,7 @@ Retrieves the top N most populated capital cities within a specified continent. 
 
 **Inputs:** Continent name and number of capital cities (N).
 
-### Requirement 22 – Top N Populated Capital Cities in a Region
+### Requirement 22: Top N Populated Capital Cities in a Region
 
 **Class:** `Requirement22.java`
 
@@ -221,7 +221,7 @@ These requirements provide population breakdowns showing the total population, t
 
 ---
 
-### Requirement 23 – Population Breakdown by Continent
+### Requirement 23: Population Breakdown by Continent
 
 **Purpose:** Display the total population, population living in cities, and population not living in cities for each continent.
 
@@ -237,7 +237,7 @@ These requirements provide population breakdowns showing the total population, t
 - `getContinentPopulationBreakdown()` – retrieves and formats the population breakdown for each continent.
 - `printReport(ArrayList<String> rows)` – displays the formatted report.
 
-### Requirement 24 – Population Breakdown by Region
+### Requirement 24: Population Breakdown by Region
 
 **Purpose:** Display the total population, population living in cities, and population not living in cities for each region.
 
@@ -253,7 +253,7 @@ These requirements provide population breakdowns showing the total population, t
 - `getRegionPopulationBreakdown()` – retrieves and formats the population breakdown for each region.
 - `printReport(ArrayList<String> rows)` – displays the formatted report.
 
-### Requirement 25 – Population Breakdown by Country
+### Requirement 25: Population Breakdown by Country
 
 **Purpose:** Display the total population, population living in cities, and population not living in cities for each country.
 
@@ -281,6 +281,127 @@ Requirements 23–25 focus on showing how a population is distributed between pe
   All three requirements use data from the country and city tables. They calculate the urban population by adding the populations of cities, then calculate the rural population by subtracting the urban population from the total population. They also calculate the percentages of people living in and outside cities.
 
 The reports are ordered by total population in descending order and use a subquery and LEFT JOIN to ensure population figures are aggregated correctly and countries without city records are included.
+
+---
+
+## 6. Population Totals and Language Reports (Requirements 26–32)
+
+This section covers retrieving population totals at different geographical levels and reporting the estimated number of people who speak selected languages.
+
+### Requirement 26: Population of the World
+
+**Purpose:** Retrieves and displays the total population of the world.
+
+**Implementation:**
+- Uses the `country` table.
+- Uses SQL `SUM()` to add the population of all countries.
+- Returns the result as a `long` value to accommodate large population totals.
+- Returns `-1` if the database connection or query fails.
+- Displays the population using comma separators for readability.
+
+**Main methods:**
+- `getWorldPopulation()` – Calculates and returns the total world population.
+- `printWorldPopulation()` – Displays the result.
+
+### Requirement 27: Population of a Continent
+
+**Purpose:** Retrieves and displays the total population of a specified continent.
+
+**Implementation:**
+- Uses the `country` table.
+- Uses SQL `SUM()` to calculate the combined population of countries belonging to the selected continent.
+- Uses a parameterised `PreparedStatement` to safely supply the continent name.
+- Validates the database connection and continent input.
+- Returns `-1` if the population cannot be retrieved.
+
+**Main methods:**
+- `getContinentPopulation(String continent)` – Calculates and returns the continent's population.
+- `printContinentPopulation(String continent)` – Displays the result.
+
+### Requirement 28: No Corresponding Class Found
+
+**Purpose:** A corresponding `Requirement28.java` class was not found in the repository branch reviewed.
+
+**Implementation status:**
+- No implementation could be documented.
+- The intended functionality should be checked against the original coursework requirements before this requirement is implemented or described further.
+
+### Requirement 29: Population of a Country
+
+**Purpose:** Retrieves and displays the population of a specified country.
+
+**Implementation:**
+- Uses the `country` table.
+- Retrieves the `Population` value for the country matching the supplied name.
+- Uses a parameterised `PreparedStatement`.
+- Validates the database connection and country name.
+- Returns `-1` if the country cannot be found or the query fails.
+
+**Main methods:**
+- `getCountryPopulation(String countryName)` – Retrieves and returns the country's population.
+- `printCountryPopulation(String countryName)` – Displays the result.
+
+### Requirement 30: Population of a District
+
+**Purpose:** Retrieves and displays the total population of a specified district.
+
+**Implementation:**
+- Uses the `city` table.
+- Uses SQL `SUM()` to add the populations of all cities belonging to the specified district.
+- Uses a parameterised `PreparedStatement` to supply the district name.
+- Validates the database connection and district input.
+- Returns `-1` if the district has no matching population records or an error occurs.
+
+**Main methods:**
+- `getDistrictPopulation(String district)` – Calculates and returns the district's population.
+- `printDistrictPopulation(String district)` – Displays the result.
+
+### Requirement 31: Population of a City
+
+**Purpose:** Retrieves and displays the population of a specified city.
+
+**Implementation:**
+- Uses the `city` table.
+- Retrieves the population of a city matching the supplied name.
+- Uses `ORDER BY Population DESC LIMIT 1` to return the largest population record when multiple cities share the same name.
+- Uses a parameterised `PreparedStatement`.
+- Validates the database connection and city name.
+- Returns `-1` if the city cannot be found or an error occurs.
+
+**Main methods:**
+- `getCityPopulation(String cityName)` – Retrieves and returns the city's population.
+- `printCityPopulation(String cityName)` – Displays the result.
+
+### Requirement 32: Population of People Speaking Selected Languages
+
+**Purpose:** Displays the estimated number of people who speak Chinese, English, Hindi, Spanish and Arabic, ordered from the highest number of speakers to the lowest. The report also displays each language's estimated percentage of the world population.
+
+**Implementation:**
+- Uses the `countrylanguage` and `country` tables.
+- Joins the tables using `countrylanguage.CountryCode` and `country.Code`.
+- Calculates estimated speakers by multiplying each country's population by the percentage of people who speak the language.
+- Uses a subquery to calculate the total world population.
+- Calculates the percentage of the world population represented by each language's estimated speakers.
+- Uses `GROUP BY` to aggregate results for each language.
+- Uses `ORDER BY Speakers DESC` to display languages from the highest number of speakers to the lowest.
+- Returns the formatted report rows in an `ArrayList<String>`.
+
+**Main methods:**
+- `getLanguagePopulationReport()` – Retrieves and formats the language population statistics.
+- `printReport(ArrayList<String> rows)` – Displays the language population report.
+
+
+## Summary
+
+Requirements 26–32 focus on retrieving population totals at different geographical levels and reporting the estimated number of speakers of selected languages.
+- Requirement 26: Retrieves the total population of the world.
+- Requirement 27: Retrieves the total population of a specified continent.
+- Requirement 28: No corresponding Java class was found in the repository.
+- Requirement 29: Retrieves the population of a specified country.
+- Requirement 30: Calculates the total population of a specified district by adding the populations of its cities.
+- Requirement 31: Retrieves the population of a specified city.
+- Requirement 32: Estimates the number of people who speak Chinese, English, Hindi, Spanish and Arabic, including each language's percentage of the world population.
+  Most of these requirements use SQL queries with SUM() or retrieve individual population records. They also use PreparedStatement to safely pass user-supplied values into queries. Requirement 32 uses a JOIN, calculations and grouping to generate its language report.
 
 ---
 
