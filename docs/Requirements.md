@@ -154,10 +154,64 @@ Retrieves the top N most populated cities within a specified district. The class
 
 **Inputs:** District name and number of cities (N).
 
-### Summary
+## Summary
 
 Requirements 7–11 retrieve all matching cities based on geographical location, while Requirements 12–16 retrieve only the top N most populated cities within the selected geographical scope.
 
 The requirement classes retrieve city information from the database, return the results as collections of `City` objects and provide methods for displaying the information in formatted tables.
 
 ---
+
+
+## 4. Capital City Reports (Requirements 17–22)
+
+This group of requirements focuses on retrieving information about capital cities and their populations. The reports allow users to view capital cities according to geographical location and population size.
+
+The application identifies capital cities by joining the `city` and `country` tables using the city's ID and the country's capital ID.
+
+---
+
+### Requirement 17 – All Capital Cities in the World
+
+**Class:** `Requirement17.java`
+
+Retrieves all capital cities stored in the database and organises them in descending order of population. The report displays the name, country code, district and population of each capital city.
+
+### Requirement 19 – All Capital Cities in a Region
+
+**Class:** `Requirement19.java`
+
+Retrieves all capital cities located within a specified geographical region. The class joins the `city` and `country` tables to identify capital cities and filter them according to their country's region. Results are organised in descending order of population.
+
+**Input:** Region name.
+
+### Requirement 20 – Top N Populated Capital Cities in the World
+
+**Class:** `Requirement20.java`
+
+Retrieves the top N most populated capital cities in the world. The number of capital cities returned is determined by the value supplied for N. Results are organised in descending order of population.
+
+**Input:** Number of capital cities (N).
+
+### Requirement 21 – Top N Populated Capital Cities in a Continent
+
+**Class:** `Requirement21.java`
+
+Retrieves the top N most populated capital cities within a specified continent. The class joins the `city` and `country` tables to identify capital cities belonging to the requested continent and limits the results to N.
+
+**Inputs:** Continent name and number of capital cities (N).
+
+### Requirement 22 – Top N Populated Capital Cities in a Region
+
+**Class:** `Requirement22.java`
+
+Retrieves the top N most populated capital cities within a specified geographical region. The results are filtered by region and organised in descending order of population.
+
+**Inputs:** Region name and number of capital cities (N).
+
+## Summary
+
+Requirements 17–22 focus specifically on capital city population reports. Requirement 17 retrieves all capital cities worldwide, while Requirement 19 filters capital cities by region. Requirements 20–22 retrieve the top N most populated capital cities based on geographical scope.
+
+---
+
