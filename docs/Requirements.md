@@ -2,6 +2,21 @@
 
 ---
 
+## Table of Contents
+
+## Table of Contents
+
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Country Population Reports (Requirements 1–6)](#2-country-population-reports-requirements-16)
+3. [City Population Reports (Requirements 7–16)](#3-city-population-reports-requirements-716)
+4. [Capital City Reports (Requirements 17–22)](#4-capital-city-reports-requirements-1722)
+5. [Urban and Rural Population Reports (Requirements 23–25)](#5-urban-and-rural-population-reports-requirements-2325)
+6. [Population Totals and Language Reports (Requirements 26–32)](#6-population-totals-and-language-reports-requirements-2632)
+
+---
+
 ## 1. Introduction
 
 This document describes the functionality implemented by the individual requirement classes in the Population Reporting System. Each class is responsible for retrieving and presenting specific population-related information from the World database.
@@ -318,13 +333,6 @@ This section covers retrieving population totals at different geographical level
 - `getContinentPopulation(String continent)` – Calculates and returns the continent's population.
 - `printContinentPopulation(String continent)` – Displays the result.
 
-### Requirement 28: No Corresponding Class Found
-
-**Purpose:** A corresponding `Requirement28.java` class was not found in the repository branch reviewed.
-
-**Implementation status:**
-- No implementation could be documented.
-- The intended functionality should be checked against the original coursework requirements before this requirement is implemented or described further.
 
 ### Requirement 29: Population of a Country
 
